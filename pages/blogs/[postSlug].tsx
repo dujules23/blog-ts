@@ -1,4 +1,7 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
+import fs from 'fs'
+import path from 'path'
+import matter from "gray-matter"
 
 
 interface Props {}
@@ -15,8 +18,19 @@ export const getStaticProps: GetStaticProps = () => {
 }
 
 export const getStaticPaths: GetStaticPaths = () => {
+  // reading paths
+
+  const dirPathToRead = path.join(process.cwd(), 'pages/posts')
+  const dirs = fs.readdirSync(dirPathToRead)
+  const paths = dirs.map(filename => {
+    const filePathToRead = path.join(process.cwd(), 'pages/posts/' + filename)
+    const fileContent = fs.readFileSync(filePathToRead, { encoding: 'utf-8'})
+    return  { params: { postSlug: matter(fileContent).data.slug}}
+  })
+
+ 
   return {
-    paths: [{ params: { postSlug: "clever-lazy-loading-for-javascript"}}],
+    paths,
     fallback: false // I'll come back to this later
   }
 }
