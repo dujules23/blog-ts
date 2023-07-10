@@ -1,24 +1,11 @@
-import { NextApiHandler } from "next"
+// only things needed for the backend (api calls)
 import matter from "gray-matter"
 import fs from 'fs'
 import path from 'path'
+import { PostApiResponse } from "@/utils/types"
 
 
-const handler: NextApiHandler = (req, res) => {
-  const { method } = req;
-
-  switch (method) {
-    case "GET": {
-      const data = readPostsInfo()
-      return res.json({ postInfo: data })
-    }
-      
-    default: 
-      return res.status(404).send("Not Found")
-  }
-}
-
-const readPostsInfo = () => {
+export const readPostsInfo = (): PostApiResponse => {
   const dirPathToRead = path.join(process.cwd(), 'pages/posts')
   const dirs = fs.readdirSync(dirPathToRead)
   const data = dirs.map(filename => {
@@ -27,7 +14,5 @@ const readPostsInfo = () => {
     return matter(fileContent).data
   })
 
-  return data
+  return data as PostApiResponse
 }
-
-export default handler
